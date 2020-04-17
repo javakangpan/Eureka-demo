@@ -1,3 +1,12 @@
-C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\demo\model\BaseEntity.java
 C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\WaiterServiceApplication.java
-C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\demo\model\Coffee.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\config\RedisConfig.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\model\CoffeeRequest.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\model\Status.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\model\BaseEntity.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\Controller\CoffeeController.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\repository\CoffeeRepository.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\model\Coffee.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\support\MoneyDeserializer.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\util\RedisLock.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\support\MoneySerializer.java
+C:\Users\康盼Java开发工程师\eclipse-workspace\eurekaclient\src\main\java\demo\util\RedisUtil.java

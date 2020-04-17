@@ -1,13 +1,18 @@
 package demo.config;
 
+import demo.support.BytesToMoneyConverter;
+import demo.support.MoneyToBytesConverter;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.convert.RedisCustomConversions;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.Arrays;
 
 /**
  * RedisProperties 配置
@@ -95,5 +100,10 @@ public class RedisConfig {
     @Bean
     public ZSetOperations<String, Object> zSetOperations(RedisTemplate<String, Object> redisTemplate) {
         return redisTemplate.opsForZSet();
+    }
+
+    public RedisCustomConversions redisCustomConversions() {
+        return new RedisCustomConversions(
+                Arrays.asList(new MoneyToBytesConverter(), new BytesToMoneyConverter()));
     }
 }

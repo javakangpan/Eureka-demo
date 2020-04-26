@@ -102,6 +102,7 @@ public class RedisConfig {
         return redisTemplate.opsForZSet();
     }
 
+    @Bean
     public RedisCustomConversions redisCustomConversions() {
         return new RedisCustomConversions(
                 Arrays.asList(new MoneyToBytesConverter(), new BytesToMoneyConverter()));

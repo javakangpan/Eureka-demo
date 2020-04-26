@@ -1,12 +1,14 @@
-package demo.Controller;
+package demo.controller;
 
 import cn.hutool.core.date.DateUtil;
 import com.google.gson.Gson;
-import demo.model.Coffee;
-import demo.model.CoffeeCache;
-import demo.model.CoffeeRequest;
+import demo.mapStruct.MapStructStuCoffeeMapper;
+import demo.mapper.CoffeeMapper;
+import demo.mapper.StudentMapper;
+import demo.model.*;
 import demo.repository.CoffeeCacheRepository;
 import demo.repository.CoffeeRepository;
+import demo.test.logging.Log;
 import demo.util.RedisLock;
 import demo.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -14,16 +16,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 
-@RestController
+@Controller
 @Slf4j
+@RequestMapping("/coffee")
 public class CoffeeController {
 
     @Autowired
@@ -37,13 +43,57 @@ public class CoffeeController {
     private RedisUtil redisUtil;
     @Resource
     private RedisTemplate redisTemplate;
+    @Resource
+    private CoffeeMapper coffeeMapper;
+    @Resource
+    private StudentMapper studentMapper;
+    @Resource
+    private MapStructStuCoffeeMapper mapStructStuCoffeeMapper;
+
+    @GetMapping("/testMapStruct")
+    @ResponseBody
+    public MapStructStuCoffee testMapStruct() {
+        Coffee coffee = getById(1);
+        Student student = studentMapper.getStudentById(1);
+        MapStructStuCoffee mapStructStuCoffee = mapStructStuCoffeeMapper.from(student,coffee);
+        log.info("testMapStruct ==> {}",mapStructStuCoffee);
+        return mapStructStuCoffee;
+    }
+
+    @GetMapping(path = "/{id}")
+    @ResponseBody
+    @Log("根据id获取咖啡信息")
+    public Coffee getById(@PathVariable(name = "id") long id) {
+        log.info("id:{}",id);
+        //测试
+        log.info("student:{}",studentMapper.getStudentByIdWithClassInfo(1));
+        return coffeeMapper.findById(id);
+    }
 
     @GetMapping(path = "/", params = "!name")
+    @ResponseBody
     public List<Coffee> getAll() {
         return coffeeRepository.findAll(Sort.by("id"));
     }
 
+    @GetMapping(path = "/list")
+    public String getAll(Model model) {
+        List<Coffee> coffeeList = getAll();
+        model.addAttribute("coffeeList",coffeeList);
+        return "index";
+    }
+
+    @RequestMapping("/seachByName")
+    public String seachByName(String name,Model model) {
+        List<Coffee> coffeeList = new ArrayList<>();
+        coffeeList.add(getByName(name));
+        model.addAttribute("coffeeList",coffeeList);
+        return "index";
+    }
+
+
     @GetMapping(path = "/", params = "name")
+    @ResponseBody
     public Coffee getByName(@RequestParam String name) {
         Optional<CoffeeCache> cached = cacheRepository.findOneByName(name);
         if (cached.isPresent()) {
@@ -83,6 +133,7 @@ public class CoffeeController {
 
 
     @PostMapping(path ="/")
+    @ResponseBody
     public boolean updateCoffeeCount(@RequestBody CoffeeRequest coffeeRequest) {
         //当前时间+超时时间
         long time = System.currentTimeMillis() + 5*1000;

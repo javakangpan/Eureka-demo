@@ -1,0 +1,1 @@
+1587720035558|20|statement|connection 0|url jdbc:p6spy:mysql://localhost:3306/kangpan?useSSL=false&useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true|SELECT id,name,age FROM student WHERE id = ?|SELECT id,name,age FROM student WHERE id = 1

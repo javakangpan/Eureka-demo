@@ -1,0 +1,13 @@
+ __   ___       __      _____  ___    _______         _______     __      _____  ___
+|/"| /  ")     /""\    (\"   \|"  \  /" _   "|       |   __ "\   /""\    (\"   \|"  \
+(: |/   /     /    \   |.\\   \    |(: ( \___)       (. |__) :) /    \   |.\\   \    |
+|    __/     /' /\  \  |: \.   \\  | \/ \            |:  ____/ /' /\  \  |: \.   \\  |
+(// _  \    //  __'  \ |.  \    \. | //  \ ___       (|  /    //  __'  \ |.  \    \. |
+|: | \  \  /   /  \\  \|    \    \ |(:   _(  _|     /|__/ \  /   /  \\  \|    \    \ |
+(__|  \__)(___/    \___)\___|\____\) \_______)     (_______)(___/    \___)\___|\____\)
+在线制作banner的网站:http://patorjk.com/software/taag/
+Java图形验证码，支持gif、中文、算术等类型，可用于Java Web、JavaSE等项目:https://gitee.com/whvse/EasyCaptcha
+获取浏览器/操作系统/设备类型等信息:UserAgentUtils
+根据IP地址来获取位置:ip2region
+knife4j是为Java MVC框架集成Swagger生成Api文档的增强解决方案:https://github.com/xiaoymin/swagger-bootstrap-ui/blob/master/README_zh.md
+https://gitee.com/xiaoym/knife4j

@@ -11,3 +11,4 @@ Java图形验证码，支持gif、中文、算术等类型，可用于Java Web�
 根据IP地址来获取位置:ip2region
 knife4j是为Java MVC框架集成Swagger生成Api文档的增强解决方案:https://github.com/xiaoymin/swagger-bootstrap-ui/blob/master/README_zh.md
 https://gitee.com/xiaoym/knife4j
+Spring中文手册:https://www.php.cn/manual/view/21527.html

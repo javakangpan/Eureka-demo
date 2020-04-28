@@ -4,8 +4,8 @@ import demo.repository.LogRepository;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,6 +19,10 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * joinPoint.getTarget().getClass().getSimpleName()获取的是被切的类名
+ * joinPoint.getSignature().getName()获取的是被切的方法名
+ */
 @Aspect
 @Component
 @Slf4j
@@ -36,23 +40,11 @@ public class LogAspect {
 
     @Around("logPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        currentTime.set(System.currentTimeMillis());
-        HttpServletRequest request = RequestHolder.getHttpServletRequest();
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        Log aopLog = method.getAnnotation(Log.class);
-        //方法路径
-        String methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";
-        StringBuilder params = new StringBuilder("{");
-        //参数值
-        Object[] args = joinPoint.getArgs();
-        //参数名称
-        String[] argNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
-        if(args != null){
-            for (int i = 0; i < args.length; i++) {
-                params.append(" ").append(argNames[i]).append(": ").append(args[i]);
-            }
-        }
+        SubMethod subMethod = new SubMethod(joinPoint).invoke();
+        HttpServletRequest request = subMethod.getRequest();
+        Log aopLog = subMethod.getAopLog();
+        String methodName = subMethod.getMethodName();
+        StringBuilder params = subMethod.getParams();
         Logs logs = Logs.builder()
                 .returnValue(joinPoint.proceed().toString())
                 .browser(getBrowser(request))
@@ -61,18 +53,37 @@ public class LogAspect {
                 .params(params.toString() + "}")
                 .method(methodName)
                 .time(System.currentTimeMillis() - currentTime.get())
-                .logType("info").build();
+                .logType("info")
+                .address(request.getRequestURI()).build();
         logRepository.save(logs);
         log.info("日志查询:{}",logRepository.findAll());
         currentTime.remove();
         return joinPoint.proceed();
     }
+
     /**
      * 配置异常通知
      */
     @AfterThrowing(pointcut = "logPointcut()", throwing = "e")
-    public void logAfterThrowing(ProceedingJoinPoint joinPoint, Throwable e) {
-        //TO DO
+    public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
+        SubMethod subMethod = new SubMethod((ProceedingJoinPoint)joinPoint).invoke();
+        HttpServletRequest request = subMethod.getRequest();
+        Log aopLog = subMethod.getAopLog();
+        String methodName = subMethod.getMethodName();
+        StringBuilder params = subMethod.getParams();
+        Logs logs = Logs.builder()
+                .browser(getBrowser(request))
+                .description(aopLog.value())
+                .requestIp(getIp(request))
+                .params(params.toString() + "}")
+                .method(methodName)
+                .time(System.currentTimeMillis() - currentTime.get())
+                .logType("error")
+                .exceptionDetail(e.getMessage())
+                .address(request.getRequestURI()).build();
+        logRepository.save(logs);
+        log.info("日志查询:{}",logRepository.findAll());
+        currentTime.remove();
     }
     /**
      * 获取浏览器信息
@@ -111,5 +122,54 @@ public class LogAspect {
             }
         }
         return ip;
+    }
+
+    private class SubMethod {
+        private ProceedingJoinPoint joinPoint;
+        private HttpServletRequest request;
+        private Log aopLog;
+        private String methodName;
+        private StringBuilder params;
+
+        public SubMethod(ProceedingJoinPoint joinPoint) {
+            this.joinPoint = joinPoint;
+        }
+
+        public HttpServletRequest getRequest() {
+            return request;
+        }
+
+        public Log getAopLog() {
+            return aopLog;
+        }
+
+        public String getMethodName() {
+            return methodName;
+        }
+
+        public StringBuilder getParams() {
+            return params;
+        }
+
+        public SubMethod invoke() {
+            currentTime.set(System.currentTimeMillis());
+            request = RequestHolder.getHttpServletRequest();
+            MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+            Method method = signature.getMethod();
+            aopLog = method.getAnnotation(Log.class);
+            //方法路径
+            methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";
+            params = new StringBuilder("{");
+            //参数值
+            Object[] args = joinPoint.getArgs();
+            //参数名称
+            String[] argNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
+            if(args != null){
+                for (int i = 0; i < args.length; i++) {
+                    params.append(" ").append(argNames[i]).append(": ").append(args[i]);
+                }
+            }
+            return this;
+        }
     }
 }

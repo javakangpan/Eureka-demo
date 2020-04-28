@@ -1,4 +1,4 @@
-package demo.Controller;
+package demo.controller;
 
 import demo.test.Async.AsyncTask;
 import org.springframework.beans.factory.annotation.Autowired;

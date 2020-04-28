@@ -2,6 +2,7 @@ package demo.controller;
 
 import cn.hutool.core.date.DateUtil;
 import com.google.gson.Gson;
+import demo.annotations.Auth;
 import demo.mapStruct.MapStructStuCoffeeMapper;
 import demo.mapper.CoffeeMapper;
 import demo.mapper.StudentMapper;
@@ -17,11 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -47,22 +46,22 @@ public class CoffeeController {
     private CoffeeMapper coffeeMapper;
     @Resource
     private StudentMapper studentMapper;
-    @Resource
-    private MapStructStuCoffeeMapper mapStructStuCoffeeMapper;
+   //@Autowired
+   //private MapStructStuCoffeeMapper mapStructStuCoffeeMapper;
 
     @GetMapping("/testMapStruct")
     @ResponseBody
     public MapStructStuCoffee testMapStruct() {
         Coffee coffee = getById(1);
         Student student = studentMapper.getStudentById(1);
-        MapStructStuCoffee mapStructStuCoffee = mapStructStuCoffeeMapper.from(student,coffee);
-        log.info("testMapStruct ==> {}",mapStructStuCoffee);
-        return mapStructStuCoffee;
+        //MapStructStuCoffee mapStructStuCoffee = mapStructStuCoffeeMapper.from(student,coffee);
+        //log.info("testMapStruct ==> {}",mapStructStuCoffee);
+       // return mapStructStuCoffee;
+        return null;
     }
 
     @GetMapping(path = "/{id}")
     @ResponseBody
-    @Log("根据id获取咖啡信息")
     public Coffee getById(@PathVariable(name = "id") long id) {
         log.info("id:{}",id);
         //测试
@@ -72,25 +71,11 @@ public class CoffeeController {
 
     @GetMapping(path = "/", params = "!name")
     @ResponseBody
+    @Auth(required = true)
+    @Log(value = "查询所有的咖啡")
     public List<Coffee> getAll() {
         return coffeeRepository.findAll(Sort.by("id"));
     }
-
-    @GetMapping(path = "/list")
-    public String getAll(Model model) {
-        List<Coffee> coffeeList = getAll();
-        model.addAttribute("coffeeList",coffeeList);
-        return "index";
-    }
-
-    @RequestMapping("/seachByName")
-    public String seachByName(String name,Model model) {
-        List<Coffee> coffeeList = new ArrayList<>();
-        coffeeList.add(getByName(name));
-        model.addAttribute("coffeeList",coffeeList);
-        return "index";
-    }
-
 
     @GetMapping(path = "/", params = "name")
     @ResponseBody

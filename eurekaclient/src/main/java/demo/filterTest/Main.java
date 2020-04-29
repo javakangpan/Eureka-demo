@@ -1,4 +1,4 @@
- package demo.fifterTest;
+ package demo.filterTest;
 
  public class Main {
      public static void main(String[] args) {

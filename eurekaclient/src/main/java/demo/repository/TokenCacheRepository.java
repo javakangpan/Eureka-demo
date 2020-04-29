@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
 public interface TokenCacheRepository extends CrudRepository<TokenCache,Long> {
-    Optional<TokenCache> findOneByName(String name);
+    Optional<TokenCache> findOneBySessionId(String sessionId);
 }

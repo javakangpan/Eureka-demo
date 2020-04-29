@@ -9,6 +9,7 @@ import demo.model.User;
 import demo.repository.TokenCacheRepository;
 import demo.test.logging.Log;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @Slf4j
@@ -24,6 +26,8 @@ public class TestSecurityController {
     private UserMapper userMapper;
     @Resource
     private TokenCacheRepository tokenCacheRepository;
+    @Autowired
+    private HttpServletRequest request;
 
     @PostMapping("/login")
     @Log
@@ -40,9 +44,11 @@ public class TestSecurityController {
                 jsonObject.put("message","密码错误");
                 return jsonObject;
             } else {
+                HttpSession session = request.getSession();
+                String sessionId = session.getId();
                 String token =  JWT.create().withAudience(u.getId().toString())// 将 user id 保存到 token 里面
-                        .sign(Algorithm.HMAC256(u.getPassword()));// 以 password 作为 token 的密钥
-                TokenCache tokenCache = TokenCache.builder().id(u.getId()).token(token).name("token").build();
+                        .sign(Algorithm.HMAC256(u.getPassword() + sessionId));// 以 password + sessionId 作为 token 的密钥
+                TokenCache tokenCache = TokenCache.builder().id(u.getId()).token(token).sessionId(sessionId).build();
                 tokenCacheRepository.save(tokenCache);
                 jsonObject.put("message","登录成功");
                 return jsonObject;

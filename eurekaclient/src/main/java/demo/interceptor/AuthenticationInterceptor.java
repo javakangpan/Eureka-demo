@@ -56,10 +56,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         threadLocal.set(stopWatch);
         stopWatch.start();
         if(!(handler instanceof HandlerMethod)){
+            log.info("==============> isNotMethod");
             return true;
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         Method method = handlerMethod.getMethod();
+        log.info("==========> methodName:{}",method.getName());
         ////检查注释
         if(method.isAnnotationPresent(Auth.class)) {
             Auth auth = method.getAnnotation(Auth.class);
@@ -68,7 +70,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 // 从 http 请求头中取出 token
                 //String token = request.getHeader("token");
                 String token = "";
-                Optional<TokenCache> tokenCache = tokenCacheRepository.findOneByName("token");
+                String sessionId = request.getSession().getId();
+                log.info("=====================>sessionId:{}",sessionId);
+                Optional<TokenCache> tokenCache = tokenCacheRepository.findOneBySessionId(sessionId);
                 if(tokenCache.isPresent()) {
                    token = tokenCache.get().getToken();
                    log.info("tokenCache:{}",tokenCache.get());
@@ -82,7 +86,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                     if(user == null) {
                         throw new RuntimeException("用户不存在，请重新登录");
                     }
-                    JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();
+                    JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassword() + sessionId)).build();
                     return true;
                 }
 

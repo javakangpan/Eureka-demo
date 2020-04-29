@@ -1,4 +1,4 @@
-package demo.fifterTest;
+package demo.filterTest;
 
 import java.io.IOException;
 
@@ -12,16 +12,15 @@ import javax.servlet.annotation.WebFilter;
 
 import org.springframework.core.annotation.Order;
 
-@Order(1)
-@WebFilter(filterName = "firstFilter",urlPatterns = "/*")
-public class FirstFilter implements Filter {
-
+@Order(2)
+@WebFilter(filterName = "secondFilter", urlPatterns = "/*")
+public class SecondFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        System.out.println("first filter 1");
+        //to do
         chain.doFilter(request, response);
-        System.out.println("first filter 2");
+        //to do
 
     }
 

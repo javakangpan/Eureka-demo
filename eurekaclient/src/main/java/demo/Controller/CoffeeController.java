@@ -9,21 +9,22 @@ import demo.mapper.StudentMapper;
 import demo.model.*;
 import demo.repository.CoffeeCacheRepository;
 import demo.repository.CoffeeRepository;
-import demo.test.logging.Log;
+import demo.service.CoffeeService;
 import demo.util.RedisLock;
 import demo.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 
 
 @Controller
@@ -46,18 +47,23 @@ public class CoffeeController {
     private CoffeeMapper coffeeMapper;
     @Resource
     private StudentMapper studentMapper;
-   //@Autowired
-   //private MapStructStuCoffeeMapper mapStructStuCoffeeMapper;
+    @Autowired
+   private MapStructStuCoffeeMapper mapStructStuCoffeeMapper;
+
+    //Constructor >> @Autowired >> @PostConstruct
+    @PostConstruct
+    public void init() {
+        log.info("服务器加载Servlet->构造函数->@PostConstruct-Init->Service->destroy->@PreDestroy->服务器卸载Servlet");
+    }
 
     @GetMapping("/testMapStruct")
     @ResponseBody
     public MapStructStuCoffee testMapStruct() {
         Coffee coffee = getById(1);
         Student student = studentMapper.getStudentById(1);
-        //MapStructStuCoffee mapStructStuCoffee = mapStructStuCoffeeMapper.from(student,coffee);
-        //log.info("testMapStruct ==> {}",mapStructStuCoffee);
-       // return mapStructStuCoffee;
-        return null;
+        MapStructStuCoffee mapStructStuCoffee = mapStructStuCoffeeMapper.from(student,coffee);
+        log.info("testMapStruct ==> {}",mapStructStuCoffee);
+        return mapStructStuCoffee;
     }
 
     @GetMapping(path = "/{id}")
@@ -69,12 +75,29 @@ public class CoffeeController {
         return coffeeMapper.findById(id);
     }
 
-    @GetMapping(path = "/", params = "!name")
+    @Autowired
+    private CoffeeService coffeeService;
+
+    //测试不同缓存时间 缓存30秒
+    @GetMapping(path = "/test1", params = "!name")
+    @ResponseBody
+    public List<Coffee> getAll() {
+        return coffeeService.findAllCoffee();
+    }
+    //测试不同缓存时间 缓存1分钟 登录校验
+    @GetMapping(path = "/test2", params = "!name")
     @ResponseBody
     @Auth(required = true)
-    @Log(value = "查询所有的咖啡")
-    public List<Coffee> getAll() {
-        return coffeeRepository.findAll(Sort.by("id"));
+    public List<Coffee> getAll2() {
+        return coffeeService.findAllCoffee2();
+    }
+
+    //测试登录校验
+    @GetMapping(path = "/test3", params = "!name")
+    @ResponseBody
+    @Auth(required = true)
+    public List<Coffee> getAll3() {
+        return coffeeService.findAllCoffee3();
     }
 
     @GetMapping(path = "/", params = "name")

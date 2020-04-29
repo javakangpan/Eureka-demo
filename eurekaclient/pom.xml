@@ -211,6 +211,16 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.68</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+        <!--没有引入这个 缓存也可以用？-->
+<!--        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>-->
     </dependencies>
 
 <!--    <dependencyManagement>

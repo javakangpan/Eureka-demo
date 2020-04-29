@@ -13,7 +13,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
         registry.addInterceptor(authenticationInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns("/login")
-                .excludePathPatterns("/index")
                 .excludePathPatterns("/h2-console");
     }
     @Bean
